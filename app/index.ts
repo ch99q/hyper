@@ -188,7 +188,7 @@ app.on('ready', () =>
           [startX, startY] = config.windowDefaults.windowPosition;
         }
 
-        const hwin = newWindow({width, height, x: startX, y: startY}, cfg, fn);
+        let hwin: any = newWindow({width, height, x: startX, y: startY}, cfg, fn);
         windowSet.add(hwin);
         hwin.loadURL(url);
 
@@ -199,6 +199,8 @@ app.on('ready', () =>
         });
 
         hwin.on('closed', () => {
+          hwin = null;
+
           if (process.platform !== 'darwin' && windowSet.size === 0) {
             app.quit();
           }
@@ -212,6 +214,10 @@ app.on('ready', () =>
 
       // expose to plugins
       app.createWindow = createWindow;
+
+      app.on('window-all-closed', () => {
+        if (process.platform !== 'darwin') app.quit();
+      });
 
       // mac only. when the dock icon is clicked
       // and we don't have any active windows open,
